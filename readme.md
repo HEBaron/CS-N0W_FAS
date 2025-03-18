@@ -3,7 +3,7 @@
 This script, `abstraction_scaling.py`, multiplies the baseline
 abstraction data for England
 (`England_Monthly_Abstractions_1km_GW_SW_TW_199901_201412.csv` available
-from [@rameshwaran_2024]) by annual scaling factors to produce
+from [Rameshwaran et al., 2024](https://dx.doi.org/10.5285/18886f95ba84447f997efac96df456ad)) by annual scaling factors to produce
 abstraction values for different future scenarios. It has been designed
 to produce future abstraction scenarios as part of the CS-N0W project
 [(Climate services for a Net Zero resilient world -
@@ -13,38 +13,36 @@ employed.
 
 A secondary function of this script is to take the baseline abstractions
 in csv format and convert them to netcdf files, with abstractions
-grouped by water-use sector as described in section
-[5.1](#sec:gfn){reference-type="ref" reference="sec:gfn"}.
+grouped by water-use sector as described in this [section](#grouping-for-netcdf).
 
 # The scenarios
 
-This set-up has three scenarios, as described in [@baron_2023], but the
+This set-up has three scenarios, as described in [Baron et al., 2023](https://assets.publishing.service.gov.uk/media/672b50a040f7da695c921bf3/cs-now-d2-future-water-resources-scenarios.pdf), but the
 method can be adapted to any number of scenarios provided the scaling
 factor file is updated accordingly. Within the script, the number of
-scenarios is set by `scen_nos` (see Table
-[1](#tab:script_input){reference-type="ref"
-reference="tab:script_input"}).
+scenarios is set by `scen_nos` (see [Table
+1](#table_1)).
 
 The scaling factors used to produce future abstractions for the CS-N0W
 project are provided in `scaling.csv` and the associated files
 (`PWS_scaling_Sus.csv`, `PWS_scaling_BaU.csv`, and `PWS_scaling_EG.csv`)
 and their derivation is described in the future abstractions dataset
-documentation [@baron_2025].
+documentation [Baron et al., 2025](tbc).
 
 The scaling factors are applied to a five year average of the baseline
-abstractions (1999 to 2014 inclusive) as described in [@baron_2025],
+abstractions (1999 to 2014 inclusive) as described in [Baron et al., 2025](tbc),
 these averages are calculated from the baseline data within the script.
 
 # The scaling factors
 
-## Water-use sectors {#sec:wus}
+## Water-use sectors
 
 The scaling factors vary for different water-use sectors, as listed in
 the **Name** column of the scaling factor file (this column is for
 reference and is not used in the script). The water-use sectors are
 specified by the **Primary Code**, **Secondary Code** and **Use Code**
 columns (these columns appear in the baseline abstraction data, and are
-explained in Appendix Tables A1-3 in [@rameshwaran_2024a]), and for each
+explained in Appendix Tables A1-3 in [Rameshwaran et al., 2024a](https://doi.org/10.5281/zenodo.13746897)), and for each
 of the water-use sectors there are n rows to specify the groupings
 (where n=`scen_nos` for convenience). The values in these columns must
 match the values that appear in the baseline data, or be listed as 'ALL'
@@ -66,15 +64,14 @@ The sector scaling factors are only applied to the abstractions which
 match the given patterns. Any abstraction not covered by the scaling
 factors is kept constant in the future scenarios.
 
-## National and spatial scaling {#sec:nass}
+## National and spatial scaling
 
 The scaling factors are all annual, and are either national (i.e. one
 number for each year to be applied across the entire dataset) or spatial
 (i.e. vary geographically, with an annual value for each geographical
 unit). The national scaling factors are included in the scaling factors
 file, and the script reads these values and applies them to the
-abstractions for each water use sector (as described in section
-[3.1](#sec:wus){reference-type="ref" reference="sec:wus"}).
+abstractions for each water use sector (as described in this [section](#water-use-sectors)).
 
 Spatial scaling factors must be stored in separate csv files, with the
 file name listed for each future scenario in the first year of the
@@ -101,46 +98,38 @@ Welsh Water). In the example given, the spatial scaling files are
 `PWS_scaling_Sus.csv`, `PWS_scaling_BaU.csv`, and `PWS_scaling_EG.csv`,
 and the spatial identifier is `WRZ_ID`.
 
-# Settings {#sec:settings}
+# Settings
 
 At the start of the script are a set of variables and filepaths that
-need to be updated by the user, as described in Table
-[1](#tab:script_input){reference-type="ref"
-reference="tab:script_input"}.
+need to be updated by the user, as described in [Table 1](#table_1).
 
-[]{#tab:script_input label="tab:script_input"}
+ | Name                    |  Description |
+ | ------------------------- |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ | `scen_nos`              |  The number of future scenarios. This should also match the number of rows allowed for each water-use sector in the scaling and grouping csv files. |
+ | `first_year`            |  The first available year for the scaling factors. This also corresponds to the column where the spatial scaling file names are listed if the scaling factors are spatial ([section](#national-and-spatial-scaling)).|
+ | `start_year`            |  The first year that you want to produce future abstraction data for.|
+ | `end_year`              |  The last year that you want to produce future abstraction data for.|
+ | `netcdf_output`         |  This must be `True` or `False`, depending if netcdf output files are required ([section](#grouping-for-netcdf)).|
+ | `abstractions_filepath` |  Full filepath of the baseline abstraction data (csv file).|
+ | `scaling_filepath`      |  Full filepath of the scaling factor data (csv file).|
+ | `grouping_filepath`     |  Full filepath of the grouping file (csv file) - required if netcdf outputs are desired ([section](#grouping-for-netcdf)).|
+ | `savepath`              |  Path to the folder where the output files are to be saved.|
 
-::: {#tab:script_input}
-  Name                      Description
-  ------------------------- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  `scen_nos`                The number of future scenarios. This should also match the number of rows allowed for each water-use sector in the scaling and grouping csv files.
-  `first_year`              The first available year for the scaling factors. This also corresponds to the column where the spatial scaling file names are listed if the scaling factors are spatial (see section [3.2](#sec:nass){reference-type="ref" reference="sec:nass"}).
-  `start_year`              The first year that you want to produce future abstraction data for.
-  `end_year`                The last year that you want to produce future abstraction data for.
-  `netcdf_output`           This must be `True` or `False`, depending if netcdf output files are required (see section [5.1](#sec:gfn){reference-type="ref" reference="sec:gfn"}).
-  `abstractions_filepath`   Full filepath of the baseline abstraction data (csv file).
-  `scaling_filepath`        Full filepath of the scaling factor data (csv file).
-  `grouping_filepath`       Full filepath of the grouping file (csv file) - required if netcdf outputs are desired (see section [5.1](#sec:gfn){reference-type="ref" reference="sec:gfn"}).
-  `savepath`                Path to the folder where the output files are to be saved.
-
-  : Table of user inputs within the abstraction_scaling.py script.
-:::
+  Table 1: <a href="#table_1">Summary of user inputs within the abstraction_scaling.py script.</a>
 
 # Output
 
 The script outputs csv files in a similar format to the baseline
 abstraction data, but with the column headers in place, separate years
 in separate files, and with the addition of any spatial identifiers used
-for spatial scaling (see section [3.2](#sec:nass){reference-type="ref"
-reference="sec:nass"}). The naming convention for these files is:
+for spatial scaling. The naming convention for these files is:
 
     abstractions_<year>_<scenario>.csv
 
 for the years specified in the script, and the future scenarios detailed
 in the scaling factor file.
 
-## Grouping for netcdf {#sec:gfn}
-
+## Grouping for netcdf 
 If required, the script can also output netcdf files of the abstractions
 grouped into different water-use sectors and split by source:
 groundwater, GW, and surface water, SW. This requires `netcdf_output` to
@@ -180,6 +169,5 @@ be used to create a virtual environment to run the script from.
 Alternatively, it runs successfully from the Jasmin Jaspy environment
 version: `jaspy/3.11/v20240815`.\
 \
-Secondly, ensure the user-input settings are correct (see section
-[4](#sec:settings){reference-type="ref" reference="sec:settings"}).\
+Secondly, ensure the user-input settings are correct (see this [section](#settings)).\
 Finally, run the script using: `python abstraction_scaling.py`
